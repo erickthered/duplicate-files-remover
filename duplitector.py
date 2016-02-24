@@ -2,11 +2,12 @@ import sys
 import os
 import hashlib
 
+
 class Duplitector:
     filesizes = {}
     total_files = 0
     duplicated_files = 0
-    duplicated_space = 0
+    used_space = 0
     autodelete = False
 
     def chunk_reader(self, fobj, chunk_size=1024):
@@ -46,17 +47,26 @@ class Duplitector:
                     duplicate = file_hashes.get(file_hash, None)
                     if duplicate:
                         self.duplicated_files = self.duplicated_files + 1
-                        self.duplicated_space = self.duplicated_space + filesize
-                        print "%s\n\tduplicate of:\n%s\n" % (file, duplicate)
+                        self.used_space = self.used_space + filesize
+                        if self.autodelete:
+                            os.remove(file)
+                            print "Removed ", file
+                        else:
+                            print "%s\n\tduplicate of:\n%s\n" % \
+                                (file, duplicate)
                     else:
                         file_hashes[file_hash] = file
 
     def report(self):
-        print "============ ANALYSIS REPORT =========="
+        duplicated_percent = self.duplicated_files/(self.total_files*1.0)*100
+        print "\n==============  REPORT  =============="
         print "Total files: ", self.total_files
         print "Duplicated files: ", self.duplicated_files
-        print "Percentage of duplicated files: ", (self.duplicated_files*1.0)/(self.total_files*1.0)*100, "%"
-        print "Duplicated files disk space: ", self.duplicated_space," bytes"
+        print "Percentage of duplicated files: ", duplicated_percent, "%"
+        if self.autodelete:
+            print "Recovered disk space: ", self.used_space, " bytes"
+        else:
+            print "Duplicated disk space usage: ", self.used_space, " bytes"
 
 
 if __name__ == '__main__':
@@ -65,4 +75,7 @@ if __name__ == '__main__':
         d.check_for_duplicates(sys.argv[1:])
         d.report()
     else:
-        print "Usage: ",sys.argv[0]," [--delete] <path> [<path_2> [<path3>] ... ]"
+        usage = "Usage :"
+        usage = usage + sys.argv[0]
+        usage = usage + " [--delete] <path> [<path_2> [<path3>] ... ]"
+        print usage
