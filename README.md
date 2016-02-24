@@ -16,11 +16,17 @@ Simply clone the project and run duplitector using the python interpreter provid
 
 The program will report what duplicate files it finds and how much space is being used by them.
 
+Depending on the number of duplicated files you may want to save the output to a report file, in such cases you can use a command like this:
+
+    python duplitector.py <path> > report.txt
+
+This will save the program output to a file named *report.txt*.
+
 ## Autodelete files
 
 If you want to automatically delete duplicated files from the filesystem you must specifiy the *--delete* flag as the first parameter:
 
-	python --delete duplitector.py <path>
+	python duplitector.py --delete <path>
 
 The output of the program will show you what files the program deleted and how much disk space was freed.
 
